@@ -74,7 +74,7 @@ class Qlearning_CartPole:
             self.total_score.append(i)
             mean=np.mean(self.scores)
             print((mean,len(self.scores),e))
-            if mean >= 195:
+            if mean >= 180:
                 return "Ok"
             self.env.close()
         return "Not complete"
@@ -118,10 +118,4 @@ class Qlearning_CartPole:
         for key in self.states_count:
             data.append(self.states_count[key])
         plt.hist(data, len(data), facecolor='green',edgecolor='k', alpha=0.75)
-        print(len(data))
         plt.show()
-
-# Environment 'CartPole-v0'
-Cart = Qlearning_CartPole('CartPole-v0',100000,1,0.001,0.1)
-print(Cart.start())
-Cart.printGraph()

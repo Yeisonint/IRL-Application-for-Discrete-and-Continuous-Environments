@@ -39,10 +39,10 @@ class CartPoleFeatureEstimate:
         self.feature[3]=self.gaussian_function(0,state[3],0.5)
         return self.feature
 
-# Clase Neuronal Network Agent
+# Neuronal Network Agent Class
 class NNAgent:
     
-    # Inicializa los parametros 
+    # Initialization Function 
     def __init__(self, env, action_space, observation_space, alpha = 0.001, batch_size = 10, gamma = 1, exploration_rate = 1, exploration_decay = 0.9, min_exploration = 0.1, max_memory = 1000):
         self.env = env
         self.action_space = action_space
@@ -56,27 +56,25 @@ class NNAgent:
         self.memory = deque(maxlen=max_memory)
         self.model = None
     
-    # Construye un modelo en blanco con los parametros de inicializacion y otros adicionales con respecto al numero de neuronas y su activacion
-    # "layers" es un vector de tuplas que contiene el numero de neuronas y su activacion [(#neuronas,'activacion'),...]
+    # Build a blank model with the initialization parameters and additional ones with respect to the number of neurons and their activation
+    # "layers" is a tuple vector that contains the number of neurons and their activation [(# neurons, 'activation'), ...]
     def makeNewModel(self, layers = [(24,'relu'),(24,'relu')]):
         self.model = Sequential()
-        self.model.add(Dense(layers[0][0], input_shape=(self.observation_space,), activation=layers[0][1])) # Capa de entrada
+        self.model.add(Dense(layers[0][0], input_shape=(self.observation_space,), activation=layers[0][1])) # Input layer
         for layer in layers[1:]:
-            self.model.add(Dense(layer[0], activation=layer[1])) # Demas capas de la red (capas ocultas)
-        self.model.add(Dense(self.action_space,activation='linear')) # Capa de salida
-        #self.model.compile(loss='mse', optimizer=Adam(lr=self.alpha)) # Compilacion del modelo
-        self.model.compile(loss='mse', optimizer=Adam(), metrics=['mae']) # Compilacion del modelo
+            self.model.add(Dense(layer[0], activation=layer[1])) # hidden layers
+        self.model.add(Dense(self.action_space,activation='linear')) # output layer
+        self.model.compile(loss='mse', optimizer=Adam(), metrics=['mae']) # model compilation
         
-    # Memoria de la red neuronal
+    # Neuronal network memory
     def add_to_memory(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
     
-    # Toma una accion aleatoria si el numero generado es menor a la tasa de exploracion, de lo contrario devuelve la accion que dice la red
+    # Take an action
     def take_action(self, state):
         return random.randrange(0, self.action_space) if np.random.rand() < self.exploration_rate else np.argmax(self.model.predict(state)[0])
     
-    # Empieza a "recordar" su trayectoria para que la red neuronal no se sobreentrene con los ultimos datos que haya visto
-    # Aqui es donde aplica QLearning, al interpretar la funcion como un problema de optimizacion
+    # Replay the memory
     def experience_replay(self):
         if len(self.memory) < self.batch_size:
             #minibatch = random.sample(self.memory, len(self.memory))
@@ -94,26 +92,23 @@ class NNAgent:
         self.exploration_rate *= self.exploration_decay
         self.exploration_rate = max(self.min_exploration, self.exploration_rate)
     
-    # Guarda los pesos actuales del modelo
     def save(self, filename):
         self.model.save_weights(filename)
-    
-    # Carga los pesos al modelo actual
+    l
     def load(self, filename):
         self.model.load_weights(filename)
 
 class EnvironmentSolver:
     route = []
-    # Incializacion de la clase
     def __init__(self, solver):
         self.total_score = []
         self.solver = solver
     
-     # Funcion decreciente con el tiempo
+    # Function decreasing over time
     def dec(self,value,time):
         return max(value, min(1.0, 1.0 - math.log10((time + 1)/100)))
     
-    # Comienza el entrenamiento del entorno
+    # Begins training
     def train(self, episodes, render):
         observation_space = self.solver.observation_space
         action_space = self.solver.action_space
@@ -174,7 +169,6 @@ class EnvironmentSolver:
             action_space = self.solver.action_space
             state = self.solver.env.reset()
             done = False
-            # Hace un ultimo recorrido en el cual usa la tabla Q aprendida
             i=0
             reward_total=0
             current_route = []
@@ -210,8 +204,3 @@ class EnvironmentSolver:
     def loadTrain(self,name):
         self.solver.load("./"+name+"/w")
         self.total_score=list(np.load("./"+name+"/scores.npy"))
-        
-env = gym.make('CartPole-v1').env
-solver = NNAgent(env, env.action_space.n, env.observation_space.shape[0], LEARNING_RATE, BATCH_SIZE, GAMMA, EXPLORATION_RATE, EXPLORATION_DECAY, EXPLORATION_MIN, MAX_MEMORY)
-solver.makeNewModel()
-Agent = EnvironmentSolver(solver)

@@ -8,7 +8,7 @@ import random
 import time
 from scipy import interpolate
 
-# Estado - accion
+# State - action
 DISC_STATES = (5, 5, 12, 9)
 q_table = np.zeros(DISC_STATES + (2,))
 scores = []
@@ -23,21 +23,20 @@ class CartPoleFeatureEstimate:
         self.feature_num = 4
         self.feature = np.ones(self.feature_num)
     
-    # Funcion de disctretizacion
+    # Disctretization function
     def discretize(self, Observation):
-        # Limites superiores e inferiores
-        # ~[4.8,0.5,24,50] los dos ultimos son grados, pero se añaden a la tabla en radianes.
         upper_bounds = [self.env.observation_space.high[0], 0.5, self.env.observation_space.high[2], math.radians(50)]
         lower_bounds = [self.env.observation_space.low[0], -0.5, self.env.observation_space.low[2], -math.radians(50)]
-        # Proporcion entre la observacion y los limites
         ratios = [(Observation[i] + abs(lower_bounds[i])) / (upper_bounds[i] - lower_bounds[i]) for i in range(len(Observation))]
         dis_obs = [int(round((DISC_STATES[i] - 1) * ratios[i])) for i in range(len(Observation))]
         dis_obs = [min(DISC_STATES[i] - 1, max(0, dis_obs[i])) for i in range(len(Observation))]
         return tuple(dis_obs)
-
+    
+    # Gaussian Function
     def gaussian_function(self, x, mu, sig):
         return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
-
+    
+    # Feature function
     def get_features(self, state):
         self.feature[0]=self.gaussian_function(0,state[0],2.4)
         self.feature[1]=self.gaussian_function(0,state[0],1.)
@@ -55,7 +54,6 @@ def calc_feature_expectation(gamma, q_table, demonstrations, env):
     demo_num = len(demonstrations)
     
     for _ in range(demo_num):
-        #state = env.reset()
         cont_state = env.reset()
         state = feature_estimate.discretize(cont_state)
         demo_length = 0
@@ -91,7 +89,7 @@ def expert_feature_expectation(gamma, demonstrations, env):
     
     return feature_expectations
 
-
+# Optimizer
 def QP_optimizer(learner, expert):
     w = cp.Variable(4)
     
@@ -110,10 +108,10 @@ def QP_optimizer(learner, expert):
     else:
         print("status:", prob.status)
         
-        weights = np.zeros(feature_num)
+        weights = np.zeros(4)
         return weights, prob.status
 
-# Actualiza tabla Q
+# Update Q Table
 def update_q_table(state, action, reward, next_state):
     q_1 = q_table[state][action]
     q_2 = reward + gamma * max(q_table[next_state])
@@ -129,7 +127,7 @@ def add_feature_expectation(learner, temp_learner):
     learner = np.vstack([learner, temp_learner])
     return learner
 
-# Prueba el aprendizaje y retorna la recompensa total
+# Test the learning
 def trylearning():
     env = gym.make('CartPole-v0')
     feature_estimate = CartPoleFeatureEstimate(env)
@@ -145,25 +143,20 @@ def trylearning():
     env.close()
     print("Recompensa total: "+str(total_reward))
 
-# Inicia IRL
-def main():
-    # Carga el entorno
+# IRL
+def train():
+    # Environment
     env = gym.make('CartPole-v0')
-    # Obtiene las demostraciones del experto
-    demonstrations = np.load("Test.npy",allow_pickle=True)
+    # Expert demonstrations
+    demonstrations = np.load("./CartPole/Test.npy",allow_pickle=True)
     
-    # Caracteriza las condiciones del entorno dentro de un objeto
+    # Estimate features
     feature_estimate = CartPoleFeatureEstimate(env)
-    
-    # Ni idea, pero creo que en base al gamma, da mayor peso a los estados cuando son visitados las primeras veces
     learner = calc_feature_expectation(gamma, q_table, demonstrations, env)
     learner = np.matrix([learner])
-    
-    # Lo mismo que el anterior pero con el experto
     expert = expert_feature_expectation(gamma, demonstrations, env)
     expert = np.matrix([expert])
     
-    # Inicializa los pesos
     w, status = QP_optimizer(learner, expert)
     
     episodes, scores = [], []
@@ -210,5 +203,3 @@ def main():
                 if status=="infeasible":
                     learner = subtract_feature_expectation(learner)
 
-if __name__ == '__main__':
-    main()
