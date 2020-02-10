@@ -6,7 +6,7 @@ import time
 import matplotlib.pyplot as plt
 
 # Crea el entorno
-env = gym.make('Taxi-v3')
+env = gym.make('Taxi-v2')
 
 # Establece los hiperparametros
 min_epsilon = 0.1

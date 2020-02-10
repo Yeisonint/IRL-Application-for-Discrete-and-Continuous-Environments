@@ -74,7 +74,7 @@ class Qlearning_CartPole:
             self.total_score.append(i)
             mean=np.mean(self.scores)
             print((mean,len(self.scores),e))
-            if mean >= 180:
+            if mean >= 200:
                 return "Ok"
             self.env.close()
         return "Not complete"
@@ -92,7 +92,7 @@ class Qlearning_CartPole:
             reward_total=0
             current_route = []
             while i<5000 and done == False:
-                self.env.render(mode  =  'rgb_array')
+                #self.env.render(mode  =  'rgb_array')
                 action = np.argmax(self.Q_table[current_state])
                 cont, reward, done, _ = self.env.step(action)
                 current_route.append((cont,action,reward))
@@ -101,7 +101,8 @@ class Qlearning_CartPole:
                 reward_total+=reward
                 i += 1
             print((reward_total,n))
-            self.route.append(current_route)
+            if reward_total >= 190:
+                self.route.append(current_route)
             self.env.close()
     
     def printGraph(self):

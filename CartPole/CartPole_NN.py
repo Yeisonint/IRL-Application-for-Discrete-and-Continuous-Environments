@@ -94,7 +94,7 @@ class NNAgent:
     
     def save(self, filename):
         self.model.save_weights(filename)
-    l
+    
     def load(self, filename):
         self.model.load_weights(filename)
 
@@ -159,7 +159,7 @@ class EnvironmentSolver:
             state_next, reward, done, info = self.solver.env.step(action)
             state = state_next
             total_reward += reward
-        env.close()
+        self.solver.env.close()
         print("Recompensa total: "+str(total_reward))
         print("Termino")
 

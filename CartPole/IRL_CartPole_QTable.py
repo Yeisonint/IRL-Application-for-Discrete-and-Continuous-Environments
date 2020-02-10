@@ -148,7 +148,7 @@ def train():
     # Environment
     env = gym.make('CartPole-v0')
     # Expert demonstrations
-    demonstrations = np.load("./CartPole/Test.npy",allow_pickle=True)
+    demonstrations = np.load("Test.npy",allow_pickle=True)
     
     # Estimate features
     feature_estimate = CartPoleFeatureEstimate(env)

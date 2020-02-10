@@ -284,7 +284,3 @@ class IRL_EnvironmentSolver:
         print(self.w)
         self.solver.env.close()
 
-env = gym.make('CartPole-v1').env
-solver = NNAgent(env, env.action_space.n, env.observation_space.shape[0], LEARNING_RATE, BATCH_SIZE, GAMMA, EXPLORATION_RATE, EXPLORATION_DECAY, EXPLORATION_MIN, MAX_MEMORY)
-solver.makeNewModel()
-Agent = IRL_EnvironmentSolver(solver)

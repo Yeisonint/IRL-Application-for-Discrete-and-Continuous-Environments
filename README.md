@@ -31,6 +31,7 @@ Cart = Qlearning_CartPole('CartPole-v1',1000,1,0.01,0.1)
 Cart.start()
 Cart.printGraph()
 ```
+
 ### QLearning Cartpole with Neuronal Network
 
 Run a terminal with python -i and the code:
@@ -49,4 +50,50 @@ Agent = EnvironmentSolver(solver)
 Agent.printGraph()
 ```
 
+### IRL Cartpole with QTable
+
+Run a terminal with python -i and the code:
+
+``` bash
+python3 -i ./CartPole/IRL_CartPole_QTable.py
+```
+
+Ony run these:
+
+``` bash
+train()
+test()
+```
+
+### IRL Cartpole with Neuronal Network
+
+Run a terminal with python -i and the code:
+
+``` bash
+python3 -i ./CartPole/IRL_CartPole_QTable.py
+```
+
+Ony run these:
+
+``` bash
+env = gym.make('CartPole-v1').env
+solver = NNAgent(env, env.action_space.n, env.observation_space.shape[0], LEARNING_RATE, BATCH_SIZE, GAMMA, EXPLORATION_RATE, EXPLORATION_DECAY, EXPLORATION_MIN, MAX_MEMORY)
+solver.makeNewModel()
+Agent = IRL_EnvironmentSolver(solver)
+```
+
 ## Running Taxi
+
+Run a terminal with python -i and the code:
+
+``` bash
+python3 -i ./Taxi-v2/Taxi-v2.py
+```
+
+Ony run these:
+
+``` bash
+startLearning(False)
+trylearning()
+printGraph()
+```
