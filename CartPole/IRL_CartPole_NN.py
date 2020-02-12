@@ -217,7 +217,7 @@ class IRL_EnvironmentSolver:
                 next_state, reward, done, _ = self.solver.env.step(action)
                 state = np.array([next_state])
                 features = feature_estimate.get_features(state)
-                feature_expectations += (gamma**(demo_length)) * np.array(numFeatures)
+                feature_expectations += (gamma**(demo_length)) * np.array(features)
                 i+=1
         feature_expectations = feature_expectations/ demo_num
         return feature_expectations
@@ -230,7 +230,7 @@ class IRL_EnvironmentSolver:
             for demo_length in range(len(demonstrations[demo_num])):
                 state = demonstrations[demo_num][demo_length][0]
                 features = feature_estimate.get_features(state)
-                feature_expectations += (gamma**(demo_length)) * np.array(numFeatures)
+                feature_expectations += (gamma**(demo_length)) * np.array(features)
         feature_expectations = feature_expectations / len(demonstrations)
         return feature_expectations
     

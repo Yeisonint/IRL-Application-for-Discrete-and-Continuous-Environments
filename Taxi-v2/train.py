@@ -62,7 +62,7 @@ def calc_feature_expectation(gamma, q_table, demonstrations, env):
             action = np.argmax(q_table[state])
             next_state, reward, done, _ = env.step(action)
             features = feature_estimate.get_features(next_state)
-            feature_expectations += (gamma**(demo_length)) * np.array(3)
+            feature_expectations += (gamma**(demo_length)) * np.array(features)
 
             state = next_state
     
@@ -78,7 +78,7 @@ def expert_feature_expectation(gamma, demonstrations, env):
         for demo_length in range(len(demonstrations[demo_num])):
             state = demonstrations[demo_num][demo_length][0]
             features = feature_estimate.get_features(state)
-            feature_expectations += (gamma**(demo_length)) * np.array(3)
+            feature_expectations += (gamma**(demo_length)) * np.array(features)
     
     feature_expectations = feature_expectations / len(demonstrations)
     

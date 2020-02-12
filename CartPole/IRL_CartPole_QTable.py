@@ -66,7 +66,7 @@ def calc_feature_expectation(gamma, q_table, demonstrations, env):
             cont_state = next_state
             next_state = feature_estimate.discretize(cont_state)
             features = feature_estimate.get_features(cont_state)
-            feature_expectations += (gamma**(demo_length)) * np.array(4)
+            feature_expectations += (gamma**(demo_length)) * np.array(features)
 
             state = next_state
     
@@ -83,7 +83,7 @@ def expert_feature_expectation(gamma, demonstrations, env):
             cont_state = demonstrations[demo_num][demo_length][0]
             state = feature_estimate.discretize(cont_state)
             features = feature_estimate.get_features(cont_state)
-            feature_expectations += (gamma**(demo_length)) * np.array(4)
+            feature_expectations += (gamma**(demo_length)) * np.array(features)
     
     feature_expectations = feature_expectations / len(demonstrations)
     
